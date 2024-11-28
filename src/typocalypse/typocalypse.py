@@ -1,12 +1,9 @@
 import re
 
 import libcst as cst
-from libcst.metadata import ParentNodeProvider
 
 
 class AddAnyAnnotationsTransformer(cst.CSTTransformer):
-    METADATA_DEPENDENCIES = [ParentNodeProvider]
-
     def __init__(
         self,
         override_existing: bool,
@@ -125,9 +122,8 @@ def transform(
     self_argument_name_re: str = "self|cls",
 ) -> str:
     tree = cst.parse_module(source_code)
-    wrapper = cst.MetadataWrapper(tree)
     transformer = AddAnyAnnotationsTransformer(
         override_existing, re.compile(self_argument_name_re)
     )
-    modified_tree = wrapper.visit(transformer)
+    modified_tree = tree.visit(transformer)
     return modified_tree.code
