@@ -1,0 +1,29 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "typocalypse"
+version = "0.0.1"
+authors = [
+  { name="Nicolas van Kempen", email="nvankemp@gmail.com" },
+]
+
+dependencies = [
+  "libcst>=1.5.1",
+]
+description = "Add 'Any' annotations everywhere to achieve 100% type coverage."
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: Apache Software License",
+  "Operating System :: OS Independent",
+]
+
+[project.scripts]
+typocalypse = "typocalypse.__main__.main"
+
+[project.urls]
+"Homepage" = "https://github.com/nicovank/typocalypse"
+"Bug Tracker" = "https://github.com/nicovank/typocalypse/issues"
