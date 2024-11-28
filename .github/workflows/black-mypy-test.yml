@@ -7,7 +7,7 @@ on:
     branches: ["master"]
 
 jobs:
-  sanity:
+  black-mypy-test:
     strategy:
       matrix:
         python: ["3.9", "3.10", "3.11", "3.12"]
