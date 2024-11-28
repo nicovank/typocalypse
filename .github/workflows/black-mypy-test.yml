@@ -1,0 +1,40 @@
+name: black-mypy-test
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["master"]
+
+jobs:
+  sanity:
+    strategy:
+      matrix:
+        python: ["3.10", "3.11", "3.12"]
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Update pip
+        run: python3 -m pip install --upgrade pip
+
+      - name: Install dependencies
+        run: python3 -m pip install black mypy pytest
+
+      - name: Install
+        run: python3 -m pip install .
+
+      - name: Black
+        run: python3 -m black --check src test
+
+      - name: MyPy
+        run: python3 -m mypy --strict src test
+
+      - name: Test
+        run: python3 -m pytest test
