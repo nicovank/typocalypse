@@ -79,11 +79,22 @@ class AddAnyAnnotationsTransformer(cst.CSTTransformer):
                 param.with_changes(annotation=cst.Annotation(cst.Name("Any")))
             )
 
+        kwonly_params = []
+        for kwonly_param in updated.params.kwonly_params:
+            if not self.override_existing and kwonly_param.annotation:
+                kwonly_params.append(kwonly_param)
+                continue
+
+            kwonly_params.append(
+                kwonly_param.with_changes(annotation=cst.Annotation(cst.Name("Any")))
+            )
+
         star_arg = updated.params.star_arg
         if (
             star_arg
             # When only **kwargs is present, star_arg seems to always be set to this value.
-            and star_arg != cst.MaybeSentinel.DEFAULT
+            and not isinstance(star_arg, cst.MaybeSentinel)
+            and not isinstance(star_arg, cst.ParamStar)
             and (self.override_existing or not star_arg.annotation)
         ):
             star_arg = star_arg.with_changes(annotation=cst.Annotation(cst.Name("Any")))
@@ -96,7 +107,10 @@ class AddAnyAnnotationsTransformer(cst.CSTTransformer):
 
         return updated.with_changes(
             params=updated.params.with_changes(
-                params=params, star_arg=star_arg, star_kwarg=star_kwarg
+                params=params,
+                kwonly_params=kwonly_params,
+                star_arg=star_arg,
+                star_kwarg=star_kwarg,
             )
         )
 

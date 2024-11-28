@@ -159,3 +159,22 @@ def test_args_kwargs() -> None:
     ).strip()
 
     assert typocalypse.transform(input) == expected
+
+
+def test_param_star() -> None:
+    input = textwrap.dedent(
+        """
+            def f(x, *, y):
+                pass
+        """
+    ).strip()
+
+    expected = textwrap.dedent(
+        """
+            from typing import Any
+            def f(x: Any, *, y: Any) -> Any:
+                pass
+        """
+    ).strip()
+
+    assert typocalypse.transform(input) == expected
