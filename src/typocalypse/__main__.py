@@ -7,14 +7,14 @@ from . import typocalypse
 def process_file(args: argparse.Namespace, path: str) -> None:
     with open(path, "r") as file:
         code = file.read()
-    code = typocalypse.transform(code, args.override_existing_annotations)
+    code = typocalypse.transform(code, args.override_existing)
     with open(path, "w") as file:
         file.write(code)
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--override-existing-annotations", action="store_true")
+    parser.add_argument("--override-existing", action="store_true")
     parser.add_argument("path", type=str, help="path to a file or directory")
     args = parser.parse_args()
 

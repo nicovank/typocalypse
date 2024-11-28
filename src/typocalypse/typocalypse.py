@@ -9,12 +9,12 @@ class AddAnyAnnotationsTransformer(cst.CSTTransformer):
 
     def __init__(
         self,
-        override_existing_annotations: bool,
+        override_existing: bool,
         self_argument_name_re: re.Pattern[str],
     ) -> None:
         super().__init__()
 
-        self.override_existing_annotations = override_existing_annotations
+        self.override_existing = override_existing
         self.self_argument_name_re = self_argument_name_re
 
         self.level = 0
@@ -65,12 +65,12 @@ class AddAnyAnnotationsTransformer(cst.CSTTransformer):
     ) -> cst.FunctionDef:
         self.level -= 1
 
-        if self.override_existing_annotations or not updated.returns:
+        if self.override_existing or not updated.returns:
             updated = updated.with_changes(returns=cst.Annotation(cst.Name("Any")))
 
         params = []
         for param in updated.params.params:
-            if not self.override_existing_annotations and param.annotation:
+            if not self.override_existing and param.annotation:
                 params.append(param)
                 continue
 
@@ -87,14 +87,12 @@ class AddAnyAnnotationsTransformer(cst.CSTTransformer):
             star_arg
             # When only **kwargs is present, star_arg seems to always be set to this value.
             and star_arg != cst.MaybeSentinel.DEFAULT
-            and (self.override_existing_annotations or not star_arg.annotation)
+            and (self.override_existing or not star_arg.annotation)
         ):
             star_arg = star_arg.with_changes(annotation=cst.Annotation(cst.Name("Any")))
 
         star_kwarg = updated.params.star_kwarg
-        if star_kwarg and (
-            self.override_existing_annotations or not star_kwarg.annotation
-        ):
+        if star_kwarg and (self.override_existing or not star_kwarg.annotation):
             star_kwarg = star_kwarg.with_changes(
                 annotation=cst.Annotation(cst.Name("Any"))
             )
@@ -123,13 +121,13 @@ class AddAnyAnnotationsTransformer(cst.CSTTransformer):
 
 def transform(
     source_code: str,
-    override_existing_annotations: bool = False,
+    override_existing: bool = False,
     self_argument_name_re: str = "self|cls",
 ) -> str:
     tree = cst.parse_module(source_code)
     wrapper = cst.MetadataWrapper(tree)
     transformer = AddAnyAnnotationsTransformer(
-        override_existing_annotations, re.compile(self_argument_name_re)
+        override_existing, re.compile(self_argument_name_re)
     )
     modified_tree = wrapper.visit(transformer)
     return modified_tree.code
