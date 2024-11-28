@@ -101,7 +101,7 @@ def test_function_override_annotation() -> None:
         """
     ).strip()
 
-    assert typocalypse.transform(input, override_existing_annotations=True) == expected
+    assert typocalypse.transform(input, override_existing=True) == expected
 
 
 def test_args() -> None:
