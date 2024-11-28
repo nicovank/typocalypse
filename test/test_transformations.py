@@ -102,3 +102,60 @@ def test_function_override_annotation() -> None:
     ).strip()
 
     assert typocalypse.transform(input, override_existing_annotations=True) == expected
+
+
+def test_args() -> None:
+    input = textwrap.dedent(
+        """
+            def f(*args):
+                pass
+        """
+    ).strip()
+
+    expected = textwrap.dedent(
+        """
+            from typing import Any
+            def f(*args: Any) -> Any:
+                pass
+        """
+    ).strip()
+
+    assert typocalypse.transform(input) == expected
+
+
+def test_kwargs() -> None:
+    input = textwrap.dedent(
+        """
+            def f(**kwargs):
+                pass
+        """
+    ).strip()
+
+    expected = textwrap.dedent(
+        """
+            from typing import Any
+            def f(**kwargs: Any) -> Any:
+                pass
+        """
+    ).strip()
+
+    assert typocalypse.transform(input) == expected
+
+
+def test_args_kwargs() -> None:
+    input = textwrap.dedent(
+        """
+            def f(*args, **kwargs):
+                pass
+        """
+    ).strip()
+
+    expected = textwrap.dedent(
+        """
+            from typing import Any
+            def f(*args: Any, **kwargs: Any) -> Any:
+                pass
+        """
+    ).strip()
+
+    assert typocalypse.transform(input) == expected

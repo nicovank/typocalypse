@@ -65,12 +65,12 @@ class AddAnyAnnotationsTransformer(cst.CSTTransformer):
     ) -> cst.FunctionDef:
         self.level -= 1
 
-        if self.override_existing_annotations or updated.returns is None:
+        if self.override_existing_annotations or not updated.returns:
             updated = updated.with_changes(returns=cst.Annotation(cst.Name("Any")))
 
         params = []
         for param in updated.params.params:
-            if not self.override_existing_annotations and param.annotation is not None:
+            if not self.override_existing_annotations and param.annotation:
                 params.append(param)
                 continue
 
@@ -82,7 +82,28 @@ class AddAnyAnnotationsTransformer(cst.CSTTransformer):
                 param.with_changes(annotation=cst.Annotation(cst.Name("Any")))
             )
 
-        return updated.with_changes(params=updated.params.with_changes(params=params))
+        star_arg = updated.params.star_arg
+        if (
+            star_arg
+            # When only **kwargs is present, star_arg seems to always be set to this value.
+            and star_arg != cst.MaybeSentinel.DEFAULT
+            and (self.override_existing_annotations or not star_arg.annotation)
+        ):
+            star_arg = star_arg.with_changes(annotation=cst.Annotation(cst.Name("Any")))
+
+        star_kwarg = updated.params.star_kwarg
+        if star_kwarg and (
+            self.override_existing_annotations or not star_kwarg.annotation
+        ):
+            star_kwarg = star_kwarg.with_changes(
+                annotation=cst.Annotation(cst.Name("Any"))
+            )
+
+        return updated.with_changes(
+            params=updated.params.with_changes(
+                params=params, star_arg=star_arg, star_kwarg=star_kwarg
+            )
+        )
 
     def leave_Module(self, original: cst.Module, updated: cst.Module) -> cst.Module:
         if self.has_any_import:
