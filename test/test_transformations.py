@@ -179,6 +179,7 @@ def test_param_star() -> None:
 
     assert typocalypse.transform(input) == expected
 
+
 def test_async() -> None:
     input = textwrap.dedent(
         """
