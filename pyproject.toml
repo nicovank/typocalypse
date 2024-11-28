@@ -22,7 +22,7 @@ classifiers = [
 ]
 
 [project.scripts]
-typocalypse = "typocalypse.__main__.main"
+typocalypse = "typocalypse.__main__:main"
 
 [project.urls]
 "Homepage" = "https://github.com/nicovank/typocalypse"
