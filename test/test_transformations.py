@@ -178,3 +178,21 @@ def test_param_star() -> None:
     ).strip()
 
     assert typocalypse.transform(input) == expected
+
+def test_async() -> None:
+    input = textwrap.dedent(
+        """
+            async def f(x):
+                pass
+        """
+    ).strip()
+
+    expected = textwrap.dedent(
+        """
+            from typing import Any
+            async def f(x: Any) -> Any:
+                pass
+        """
+    ).strip()
+
+    assert typocalypse.transform(input) == expected
